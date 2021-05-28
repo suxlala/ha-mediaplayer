@@ -27,5 +27,5 @@ Every aspect of the card and all elements can be customized.
 - replace the *entity:* in line #2 with your own mediaplayer entity
 - replace the *entity:* in line #102, #131, #132 and #134 with your Genius lyrics sensor
 - add the URL of your HA instance in line #247
-- add the content of the *script.yaml* to your scripts in your configuration.yaml or script.yaml
+- add the content of the *script.yaml* to your scripts in your configuration.yaml or script.yaml (needed for the add-to-playlist feature)
 
