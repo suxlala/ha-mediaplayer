@@ -1,0 +1,288 @@
+type: 'custom:button-card'
+entity: media_player.kitchen        ####  PUT YOUR MEDIA PLAYER ENTITY HERE
+show_entity_picture: true
+show_name: false
+show_icon: false
+state:
+  - styles:
+      entity_picture:
+        - filter: grayscale(80%) blur(2px)
+        - transition: all 0.5s ease
+    value: paused
+styles:
+  card:
+    - padding: 0px
+    - background: 'linear-gradient(0deg, rgb(44,96,138), rgb(29,12,46))'
+    - box-shadow: '7px 7px 45px -6px rgba(30, 107, 123, .7)'
+    - height: 245px
+    - border-radius: 15px
+  entity_picture:
+    - width: 35%
+    - top: 5%
+    - left: 3%
+    - border-radius: 15px
+    - transition: all 0.5s ease
+  grid:
+    - position: relative
+  custom_fields:
+    artist:
+      - position: absolute
+      - left: 42%
+      - top: 10%
+      - font-size: 1.1em
+      - font-weight: 600
+      - color: lightgrey
+      - white-space: nowrap
+      - text-overflow: ellipsis
+      - text-align: left
+      - width: 240px
+    title:
+      - position: absolute
+      - top: 12%
+      - left: 42%
+      - font-size: 1.1em
+      - color: var(--primary-color)
+      - white-space: pre-line
+      - text-align: left
+      - width: 240px
+      - height: 68px
+    lyrics:
+      - position: absolute
+      - left: 42%
+      - top: 48%
+      - width: 6%
+      - z-index: 1     
+    prev:
+      - position: absolute
+      - left: 51%
+      - top: 45%
+      - width: 9%
+    play:
+      - position: absolute
+      - left: 62.5%
+      - top: 42%
+      - width: 12%
+    next:
+      - position: absolute
+      - left: 77%
+      - top: 45%
+      - width: 9%
+    favorite:
+      - position: absolute
+      - right: 5%
+      - top: 48%
+      - width: 6%
+      - z-index: 1       
+    mediabrowser:
+      - position: absolute
+      - right: 5%
+      - top: 67%
+      - width: 5%
+      - z-index: 1            
+    miniplayer:
+      - position: absolute
+      - top: 57%
+      - left: 3%
+      - width: 93%
+custom_fields:
+  artist: |
+    [[[
+      return states[entity.entity_id].attributes.media_artist;
+    ]]]
+  title: |
+    [[[
+      return states[entity.entity_id].attributes.media_title;
+    ]]] 
+  lyrics:
+    card:
+      type: 'custom:button-card'      
+      show_name: false
+      icon: 'mdi:text'
+      size: 100%
+      entity: sensor.kitchen_lyrics     ###  YOUR GENIUS LYRICS SENSOR
+      state:
+        - styles:
+            icon:
+              - color: lightgrey
+          value: 'on'
+      styles:
+        card:
+          - background: transparent
+          - box-shadow: none
+        icon:
+          - color: grey
+      tap_action:
+        haptic: heavy
+        action: fire-dom-event
+        browser_mod:
+          command: popup
+          title: Lyrics
+          hide_header: false
+          large: false
+          style: |
+            :host {
+              --ha-card-background: linear-gradient(90deg, rgb(29,12,46), rgb(44,96,138)) !important;
+              --primary-text-color: lightgrey !important;
+              --secondary-background-color: rgb(29,12,46) !important;
+            }          
+          card:
+            type: markdown
+            content: >-
+              ## {{ states.sensor.kitchen_lyrics.attributes.media_artist }} - {{
+              states.sensor.kitchen_lyrics.attributes.media_title }}
+
+              {{ states.sensor.kitchen_lyrics.attributes.media_lyrics }}      
+  prev:
+    card:
+      type: 'custom:button-card'
+      show_name: false
+      icon: 'mdi:skip-previous'
+      size: 100%
+      styles:
+        card:
+          - padding: 0px
+          - background: transparent
+          - box-shadow: none
+        icon:
+          - transition: all 0.5s ease
+          - color: lightgrey
+      tap_action:
+        action: call-service
+        service: media_player.media_previous_track
+        service_data:
+          entity_id: '[[[ return entity.entity_id ]]]'
+        haptic: heavy
+  play:
+    card:
+      type: 'custom:button-card'
+      show_name: false
+      entity: '[[[ return entity.entity_id ]]]'
+      icon: 'mdi:pause-circle-outline'
+      size: 100%
+      state:
+        - styles:
+            icon:
+              - transition: all 0.5s ease
+          value: paused
+          icon: 'mdi:play-circle'
+      styles:
+        card:
+          - padding: 0px
+          - border-radius: 50%
+          - background: transparent
+          - box-shadow: none
+        icon:
+          - transition: all 0.5s ease
+          - color: lightgrey
+      tap_action:
+        action: call-service
+        service: media_player.media_play_pause
+        service_data:
+          entity_id: '[[[ return entity.entity_id ]]]'
+        haptic: heavy
+  next:
+    card:
+      type: 'custom:button-card'
+      show_name: false
+      icon: 'mdi:skip-next'
+      size: 100%
+      styles:
+        card:
+          - padding: 0px
+          - background: transparent
+          - box-shadow: none
+        icon:
+          - transition: all 0.5s ease
+          - color: lightgrey
+      tap_action:
+        action: call-service
+        service: media_player.media_next_track
+        service_data:
+          entity_id: '[[[ return entity.entity_id ]]]'
+        haptic: heavy         
+  favorite:
+    card:
+      type: 'custom:button-card'
+      show_name: false
+      icon: 'mdi:heart-plus-outline'
+      size: 100%
+      styles:
+        card:
+          - background: transparent
+          - box-shadow: none
+        icon:
+          - color: lightgrey
+      tap_action:
+        action: call-service
+        haptic: heavy
+        service: script.add_to_playlist    ###  IFTTT TRIGGER SCRIPT (add to favorite Spotify playlist)
+        service_data:
+          player: '[[[ return entity.entity_id ]]]'
+  mediabrowser:
+    card:
+      type: 'custom:button-card'
+      show_name: false
+      icon: 'mdi:play-box-multiple-outline'
+      size: 100%
+      color: lightgrey
+      styles:
+        card:
+          - background: transparent
+          - box-shadow: none
+      tap_action:
+        haptic: heavy
+        action: fire-dom-event
+        browser_mod:
+          command: popup
+          title: Media Browser
+          hide_header: false
+          large: false
+          style: |
+            :host {
+              --primary-text-color: lightgrey !important;
+              --secondary-background-color: rgb(29,12,46) !important;
+            }          
+          card:
+            type: iframe
+            url: 'https://szucsl.duckdns.org:8123/media-browser'   ### URL OF YOUR HA INSTANCE/media-browser
+            aspect_ratio: 200%                        
+  miniplayer:
+    card:
+      type: 'custom:mini-media-player'
+      artwork: none
+      entity: '[[[ return entity.entity_id ]]]'
+      hide:
+        controls: true
+        icon: true
+        name: true
+        power: true
+        runtime: false
+        source: true
+        volume: false
+        shuffle: false
+        info: true
+      tap_action:
+        action: none
+      style: |
+        .mmp-player {          
+           background: transparent !important;
+           height: 70px;
+           padding-left: 40% !important;
+           padding-right: 10% !important;
+           margin-bottom: 15px
+        }
+        .mmp__container, .mmp-progress > .mmp-progress__duration {
+           font-size: 1.4em !important;
+        }
+        ha-card {
+           background: transparent !important;
+           --ha-card-border-radius: 0px !important;
+           box-shadow: none;
+           color: lightgrey !important;
+        }
+        :host {
+           --mmp-text-color: lightgrey !important;
+           --mmp-accent-color: var(--primary-color) !important;
+           --mmp-bg-opacity: 0 !important;
+           --mmp-progress-height: 3px !important;
+        }
